@@ -1,0 +1,18 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0
+// at https://mozilla.org/MPL/2.0/
+// Indicateur MTF modulable – Setup à haute probabilité (HTF → LTF → signal)
+// Pas de trading automatique. Référence : PROJECT_GUIDE.md
+
+//@version=5
+indicator("Indicateur MTF modulable", shorttitle="MTF Setup", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500)
+
+// -----------------------------------------------------------------------------
+// Paramètres d'entrée (minimaux pour Phase 0 – à enrichir en Phase 1)
+// -----------------------------------------------------------------------------
+// Symbole = chart actuel (syminfo.tickerid). Aucune exécution automatique.
+
+// Placeholder pour tests visuels (optionnel) : afficher un label sur la dernière barre
+showDebugLabel = input.bool(false, "Afficher infos debug", group="Debug")
+
+if showDebugLabel and barstate.islast
+    label.new(bar_index, high, "MTF\nv5", style=label.style_label_down, size=size.small)

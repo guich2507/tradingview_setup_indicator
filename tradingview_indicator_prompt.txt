@@ -1,0 +1,129 @@
+
+Parfait ! Voici le prompt complet pour ton IA afin de coder l'indicateur TradingView :
+
+---
+
+# 🔹 Prompt complet pour l’IA – Indicateur TradingView modulable
+
+**Contexte :**
+
+Nous voulons créer un indicateur TradingView **modulaire, hiérarchique et dynamique**, destiné à l’analyse visuelle et décisionnelle pour identifier des setups à haute probabilité. 
+
+- L’indicateur **ne trade pas automatiquement**.  
+- Il doit construire **progressivement** les éléments détectés par module (HTF → LTF → signal final).  
+- Il doit être **pédagogique** : le trader doit comprendre pourquoi chaque zone ou signal est valide ou non.  
+
+---
+
+# 🔹 Paramètres globaux
+
+- `tf_mode` (string) : "focus_ltf" ou "focus_htf"  
+  - "focus_ltf" → TF principales = LTF, TF communes/intermédiaires = HTF (scalp / day trading)  
+  - "focus_htf" → TF principales = HTF, TF communes/intermédiaires = LTF (swing / long terme)  
+
+- **Tableaux TF :**  
+  - LTF = `[1m, 5m, 15m, 1h]`  
+  - HTF = `[15m, 1h, 4h, 1d]`  
+
+- **TF communes** : 15m et 1h → rôle selon `tf_mode`  
+
+---
+
+# 🔹 Logique TF dynamique
+
+1. **TF principale choisie** → rôle (LTF ou HTF) selon `tf_mode`.  
+2. **TF correspondants** :  
+   - Pour une LTF choisie, les **HTF correspondants** = les deux TF supérieures dans le tableau HTF (n et n+1).  
+   - Pour une HTF choisie, les **LTF correspondants** = TF inférieures pour confirmations locales.  
+3. **Règles :**  
+   - HTF → structure, OB/FVG, zones de liquidité, BOS/CHoCH HTF  
+   - LTF → confirmations locales : sweep, BOS/CHoCH, retest  
+4. **Construction progressive** : HTF → LTF → signal final  
+5. **Affichage obligatoire** : toutes les infos détectées doivent être visibles, même sans signal final.  
+
+---
+
+# 🔹 Modules / couches
+
+### 1️⃣ Module Contexte HTF
+
+- **Objectif :** structure dominante et biais  
+- **Repère :** HH/HL ou LH/LL, BOS/CHoCH HTF, zones de liquidité (Equal High/Low, anciens High/Low)  
+- **Sortie visuelle :** labels, flèches BOS/CHoCH, rectangles/liens zones de liquidité  
+
+### 2️⃣ Module Zones clés HTF
+
+- **Objectif :** OB/FVG et Discount/Premium  
+- **Repère :** OB HTF, FVG HTF, zones Discount/Premium  
+- **Sortie visuelle :** rectangles colorés avec labels (“OB H1”, “FVG H1”), couleur selon biais  
+
+### 3️⃣ Module Confirmation LTF
+
+- **Objectif :** valider les zones HTF avec prix local  
+- **Repère :** sweep, BOS/CHoCH LTF, retest OB/FVG  
+- **Sortie visuelle :** flèches, labels explicatifs (“Sweep détecté”), points de retest  
+
+### 4️⃣ Module Setup / Point d’entrée
+
+- **Objectif :** combiner HTF + LTF → signal final  
+- **Conditions :** biais HTF aligné + prix dans zone HTF clé + confirmation LTF validée  
+- **Sortie visuelle :** label “Setup valide”, flèche directionnelle, résumé des éléments validés  
+
+---
+
+# 🔹 Déroulé pratique
+
+- **Exemple 1h/5m, `tf_mode = focus_ltf` :**  
+  1. Sur 1h (HTF) → construction des éléments HTF, affichage visuel  
+  2. Sur 5m (LTF) → récupération infos HTF + ajout confirmations LTF  
+  3. Si toutes les conditions HTF + LTF validées → signal vert “setup valide” + point d’entrée  
+  4. Sinon → affiche le meilleur niveau d’information détecté  
+
+---
+
+# 🔹 Suggestions de codage Pine Script
+
+1. **Structures de variables :**  
+   - Arrays pour TF : `LTF[]`, `HTF[]`  
+   - Dictionnaires ou objets pour chaque module → stocker résultats, zones, labels  
+
+2. **Boucles dynamiques sur TF :**  
+```pinescript
+for tf in LTF
+    // calcul structure LTF ou HTF selon tf_mode
+for tf in HTF
+    // calcul zones HTF et BOS/CHoCH
+```
+
+3. **Affichage visuel :**  
+   - `label.new()` pour labels tendance, BOS/CHoCH, retest  
+   - `plotshape()` ou `plotarrow()` pour sweep / setup  
+   - `box.new()` pour OB / FVG / zones de liquidité  
+   - Couleurs et transparence selon type et force de zone  
+
+4. **Validation progressive :**  
+   - Chaque module construit ses éléments indépendamment  
+   - Signal final généré **uniquement si toutes les conditions sont validées**  
+
+5. **Paramètre global `tf_mode`** → utilisé pour déterminer le rôle des TF communes (15m, 1h) et hiérarchie dynamique HTF/LTF  
+
+---
+
+# 🔹 Principes clés
+
+- Modularité : chaque module indépendant  
+- Hiérarchie TF dynamique et progressive  
+- Affichage pédagogique → même sans signal final, toutes les infos visibles  
+- Signal final = toutes conditions HTF + LTF validées  
+- Outputs visuels : labels, flèches, rectangles, symboles explicatifs  
+- Construction progressive : HTF → LTF → signal  
+
+---
+
+💡 **Résultat attendu :** indicateur modulable, hiérarchique, dynamique, capable de :  
+- Afficher toutes les infos HTF et LTF selon rôle `tf_mode`  
+- Construire les éléments couche par couche  
+- Générer signal final uniquement si conditions alignées  
+- Être clair, pédagogique, utilisable pour scalp, day trading et swing  
+
+---
