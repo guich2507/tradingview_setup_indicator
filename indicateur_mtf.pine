@@ -1,135 +1,49 @@
-// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0
-// at https://mozilla.org/MPL/2.0/
-// Indicateur MTF modulable – Setup à haute probabilité (HTF → LTF → signal)
-// Pas de trading automatique. Référence : PROJECT_GUIDE.md
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © Indicateur MTF modulaire – TradingView
+// Version : structure initiale (Phase 0)
+// À copier dans l'éditeur TradingView pour tester.
+// Référence : PROJECT_GUIDE.md, PLAN_ACTION.md
 
 //@version=5
-indicator("Indicateur MTF modulable", shorttitle="MTF Setup", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500)
+indicator("Indicateur MTF modulaire", shorttitle="MTF Mod", overlay=true, max_labels_count=500, max_boxes_count=500)
 
-// =============================================================================
-// Phase 1 – Paramètres globaux et logique TF (1 LTF / 1 HTF)
-// =============================================================================
-// ltf_array = [1, 5, 15, 60]  →  indices 0..3
-// htf_array = [15, 60, 240, D]  →  indices 0..3
-// Un seul indice x : ltf = ltf_array[x], htf = htf_array[x]
-// Si graphique HTF (tf_graph seulement dans htf_array, ou both + focus_htf) →
-//   is_htf_only = true : on ne renvoie que le contexte HTF (tendance, OB/CHoCH…).
-// Si graphique LTF → is_htf_only = false : on renvoie contexte HTF + infos LTF (OB, FVG, sweep…).
-// Évolution prévue : passer à 1 LTF / 2 HTF (htf1 + htf2) dans un second temps.
+// ———————————————————————————————————————————————————————————
+// PARAMÈTRES ET INPUTS (à compléter en Phase 1 : tf_mode, TF…)
+// ———————————————————————————————————————————————————————————
 
-// -----------------------------------------------------------------------------
-// Inputs
-// -----------------------------------------------------------------------------
-groupTF = "Timeframes"
-tf_mode = input.string("focus_ltf", "Mode TF", options=["focus_ltf", "focus_htf"], group=groupTF,
-     tooltip="focus_ltf = graph considéré comme LTF (contexte HTF + raffinement LTF)\nfocus_htf = graph considéré comme HTF (contexte HTF uniquement)")
+// (vide pour l’instant ; Phase 1 ajoutera tf_mode, ltf_array, htf_array, etc.)
 
-tf_principal_source = input.string("Graphique", "TF principale", options=["Graphique", "1", "5", "15", "60", "240", "D"], group=groupTF,
-     tooltip="Graphique = TF du chart ; sinon TF fixe")
+// ———————————————————————————————————————————————————————————
+// MODULE 1 – Contexte HTF (Phase 2)
+// Tendance, structure, BOS/CHoCH HTF, zones de liquidité
+// ———————————————————————————————————————————————————————————
 
-showTFLabel = input.bool(true, "Afficher TF (label)", group=groupTF)
-showTFTable = input.bool(false, "Afficher TF (table)", group=groupTF)
+// ctxHTF_* : à implémenter
 
-groupDebug = "Debug"
-showDebugLabel = input.bool(false, "Afficher infos debug", group=groupDebug)
+// ———————————————————————————————————————————————————————————
+// MODULE 2 – Zones clés HTF (Phase 3)
+// OB, FVG, Discount/Premium
+// ———————————————————————————————————————————————————————————
 
-// -----------------------------------------------------------------------------
-// TF du graphique
-// -----------------------------------------------------------------------------
-tf_graph = tf_principal_source == "Graphique" ? timeframe.period : tf_principal_source
+// zonesHTF_* : à implémenter
 
-// -----------------------------------------------------------------------------
-// Index de tf_graph dans chaque tableau (-1 si absent)
-// -----------------------------------------------------------------------------
-x_in_ltf = tf_graph == "1" ? 0 : tf_graph == "5" ? 1 : tf_graph == "15" ? 2 : tf_graph == "60" ? 3 : -1
-x_in_htf = tf_graph == "15" ? 0 : tf_graph == "60" ? 1 : tf_graph == "240" ? 2 : tf_graph == "D" ? 3 : -1
-in_ltf_only = x_in_ltf >= 0 and x_in_htf < 0
-in_htf_only = x_in_htf >= 0 and x_in_ltf < 0
-in_both = x_in_ltf >= 0 and x_in_htf >= 0
+// ———————————————————————————————————————————————————————————
+// MODULE 3 – Confirmation LTF (Phase 4)
+// Sweep, BOS/CHoCH LTF, retest OB/FVG
+// ———————————————————————————————————————————————————————————
 
-// -----------------------------------------------------------------------------
-// Indice x et mode d'affichage (HTF seul vs HTF + LTF)
-// -----------------------------------------------------------------------------
-var int x = 0
-var bool is_htf_only = false
+// confLTF_* : à implémenter
 
-if in_ltf_only
-    x := x_in_ltf
-    is_htf_only := false
-else if in_htf_only
-    x := x_in_htf
-    is_htf_only := true
-else if in_both
-    if tf_mode == "focus_ltf"
-        x := x_in_htf
-        is_htf_only := false
-    else
-        x := x_in_ltf
-        is_htf_only := true
-else
-    // TF non gérée (ex. 30, 120, W) → fallback HTF seul
-    x := 2
-    is_htf_only := true
+// ———————————————————————————————————————————————————————————
+// MODULE 4 – Setup / point d’entrée (Phase 5)
+// Agrégation des conditions → signal final
+// ———————————————————————————————————————————————————————————
 
-// -----------------------------------------------------------------------------
-// Récupération 1 LTF / 1 HTF à partir de x (tableaux indexés 0..3)
-// -----------------------------------------------------------------------------
-f_ltf_at(int i) =>
-    i == 0 ? "1" : i == 1 ? "5" : i == 2 ? "15" : i == 3 ? "60" : ""
-f_htf_at(int i) =>
-    i == 0 ? "15" : i == 1 ? "60" : i == 2 ? "240" : i == 3 ? "D" : ""
+// setup_* : à implémenter
 
-tf_ltf = is_htf_only ? na : f_ltf_at(x)
-tf_htf = is_htf_only ? tf_graph : f_htf_at(x)
+// ———————————————————————————————————————————————————————————
+// AFFICHAGE (Phase 6 : centralisation des options)
+// ———————————————————————————————————————————————————————————
 
-// Libellés lisibles pour affichage (suffixe min / h / d)
-f_tf_label(string t) =>
-    if t == "1"
-        "1m"
-    else if t == "5"
-        "5m"
-    else if t == "15"
-        "15m"
-    else if t == "60"
-        "1h"
-    else if t == "240"
-        "4h"
-    else if t == "D"
-        "1d"
-    else
-        t
-
-// -----------------------------------------------------------------------------
-// Affichage optionnel : label TF (vérification)
-// -----------------------------------------------------------------------------
-if showTFLabel and barstate.islast
-    mode_txt = is_htf_only ? "Vue HTF (contexte seul)" : "Vue LTF (contexte + raffinement)"
-    main_txt = "Graph: " + f_tf_label(tf_graph)
-    string detail_txt = "HTF: " + f_tf_label(tf_htf)
-    if not is_htf_only and not na(tf_ltf)
-        detail_txt := "LTF: " + f_tf_label(tf_ltf) + "  |  HTF: " + f_tf_label(tf_htf)
-    label.new(bar_index, high, main_txt + "\n" + mode_txt + "\n" + detail_txt, style=label.style_label_down, size=size.small)
-
-// -----------------------------------------------------------------------------
-// Affichage optionnel : table TF (vérification)
-// -----------------------------------------------------------------------------
-var table tf_table = na
-if showTFTable and barstate.islast
-    if na(tf_table)
-        tf_table := table.new(position.top_right, 2, 5, bgcolor=color.new(color.black, 80), border_width=1)
-    table.cell(tf_table, 0, 0, "TF", text_color=color.white, text_size=size.small)
-    table.cell(tf_table, 1, 0, "Valeur", text_color=color.white, text_size=size.small)
-    table.cell(tf_table, 0, 1, "Vue", text_size=size.small)
-    table.cell(tf_table, 1, 1, is_htf_only ? "HTF seul" : "LTF + HTF", text_size=size.small)
-    table.cell(tf_table, 0, 2, "Graph", text_size=size.small)
-    table.cell(tf_table, 1, 2, f_tf_label(tf_graph), text_size=size.small)
-    table.cell(tf_table, 0, 3, "HTF", text_size=size.small)
-    table.cell(tf_table, 1, 3, f_tf_label(tf_htf), text_size=size.small)
-    table.cell(tf_table, 0, 4, "LTF", text_size=size.small)
-    table.cell(tf_table, 1, 4, na(tf_ltf) ? "—" : f_tf_label(tf_ltf), text_size=size.small)
-
-// -----------------------------------------------------------------------------
-// Debug (Phase 0)
-// -----------------------------------------------------------------------------
-if showDebugLabel and barstate.islast
-    label.new(bar_index, high, "MTF\nv5", style=label.style_label_down, size=size.small)
+// Pour l’instant : aucun tracé, script valide et exécutable.
+// Les modules ajouteront label.new(), plotshape(), box.new(), etc.
