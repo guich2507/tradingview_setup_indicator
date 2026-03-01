@@ -1,5 +1,15 @@
 # Fichier de guidage – Indicateur TradingView modulable
 
+## Pour reprendre le travail (nouvel agent / nouvelle session)
+
+1. **Lire en premier** : ce fichier (**PROJECT_GUIDE.md**), puis **PLAN_ACTION.md** pour le statut des phases et la prochaine étape.
+2. **Script principal** : **`indicateur_mtf.pine`** (Pine Script v5). C’est le seul fichier de code à modifier ; à copier dans l’éditeur TradingView pour tester.
+3. **Logique centrale** : la **sélection des timeframes** (section ci-dessous « Sélection des timeframes »). Elle détermine quelles TF sont utilisées (1 LTF / 1 HTF) et si l’indicateur affiche seulement le contexte HTF ou contexte HTF + raffinement LTF. **Ne pas la modifier** sans relire cette section et les règles de calcul de l’indice **x**.
+4. **Prochaine étape** : **Phase 2 – Module 1 (Contexte HTF)** dans PLAN_ACTION.md (données HTF via `request.security()`, tendance/structure, BOS/CHoCH, zones de liquidité). Utiliser les variables exposées `tf_htf`, `tf_ltf`, `is_htf_only` pour brancher les appels MTF.
+5. **Autres fichiers utiles** : `tradingview_indicator_prompt.txt` (prompt source), `README.md` (vue d’ensemble et liens).
+
+---
+
 ## Titre et objectif du projet
 
 Indicateur TradingView **modulaire, hiérarchique et dynamique** pour l'analyse visuelle et la décision, destiné à identifier des **setups à haute probabilité**. L'indicateur **ne trade pas automatiquement** : il fournit une aide à la décision et à la compréhension du marché.

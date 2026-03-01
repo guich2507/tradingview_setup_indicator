@@ -1,5 +1,9 @@
 # Plan d'action – Indicateur TradingView modulable
 
+**Pour reprendre le travail :** lire [PROJECT_GUIDE.md](PROJECT_GUIDE.md) (contexte + logique TF), puis ce fichier. Script à modifier : **`indicateur_mtf.pine`**. **Prochaine étape : Phase 2** (Module 1 – Contexte HTF).
+
+---
+
 Ce plan est voué à **évoluer** : sous-étapes et méthodes pourront être détaillées ou réordonnées au fil du projet.
 
 **Légende statut :** `[ ]` à faire · `[x]` fait · indiquer « en cours » en commentaire si besoin.
