@@ -2,9 +2,9 @@
 // © Indicateur MTF modulaire – TradingView
 // Version : structure initiale (Phase 0)
 // À copier dans l'éditeur TradingView pour tester.
-// Référence : PROJECT_GUIDE.md, PLAN_ACTION.md
+// Référence : PROJECT_GUIDE.md, PLAN_GUIDAGE.md
 
-//@version=5
+//@version=6
 indicator("Indicateur MTF modulaire", shorttitle="MTF Mod", overlay=true, max_labels_count=500, max_boxes_count=500)
 
 // ———————————————————————————————————————————————————————————
