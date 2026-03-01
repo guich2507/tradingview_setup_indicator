@@ -45,7 +45,7 @@ En fournissant **PROJECT_GUIDE.md** + **PLAN_GUIDAGE.md** (et éventuellement RE
 
 Indicateur TradingView **modulaire, hiérarchique et dynamique** pour l’analyse visuelle et la décision, destiné à identifier des **setups à haute probabilité**. L’indicateur **ne trade pas automatiquement** : il fournit une aide à la décision et à la compréhension du marché.
 
-**Objectif final** : un script qui **prépare une analyse technique en temps réel** sur le graphique affiché. Selon le mode (Trading LTF / Trading HTF) et la TF du graphique, le script affiche soit le contexte et les zones clés HTF (vue HTF), soit en plus les confirmations LTF et une proposition d’entrée (vue LTF).
+**Objectif final** : un script qui **prépare une analyse technique en temps réel** sur le graphique affiché. L’utilisateur indique s’il trade sur des LTF ou des HTF via le paramètre **trading_mode** (ltf_trading / htf_trading). Selon ce réglage et la TF du graphique, le script affiche soit le contexte et les zones clés HTF (vue HTF), soit en plus les confirmations LTF et une proposition d’entrée (vue LTF).
 
 ---
 
@@ -63,7 +63,7 @@ Indicateur TradingView **modulaire, hiérarchique et dynamique** pour l’analys
 
 **Ce qu’il fait** :
 - S’exécute sur le **symbole** et la **timeframe** du graphique courant.
-- Selon le **mode** (Trading LTF / Trading HTF) et la **TF du graphique**, décide si tu es en **vue HTF** ou **vue LTF** (règles ci-dessous : indice x, `is_htf_only`).
+- Selon le **trading_mode** (l’utilisateur indique s’il trade sur des LTF ou des HTF) et la **TF du graphique**, décide si tu es en **vue HTF** ou **vue LTF** (règles ci-dessous : indice x, `is_htf_only`).
 - **Vue HTF** : affiche uniquement les infos utiles pour analyser la HTF (contexte + zones clés).
 - **Vue LTF** : affiche les infos HTF **et** les infos LTF utiles pour définir un point d’entrée (confirmations + proposition d’entrée si tout est aligné).
 - **Pédagogie** : affiche **toutes** les infos détectées, même sans signal final.
@@ -101,11 +101,11 @@ Indicateur TradingView **modulaire, hiérarchique et dynamique** pour l’analys
 
 Cette logique détermine **quelles TF sont étudiées** et **quel type d’informations** l’indicateur renvoie selon le graphique affiché.
 
-### Données fixes
+### Données et paramètres
 
-- **`ltf_array`** = `[1, 5, 15, 60]` (1m, 5m, 15m, 1h) — indices 0 à 3.
-- **`htf_array`** = `[15, 60, 240, D]` (15m, 1h, 4h, 1d) — indices 0 à 3.
-- **`tf_mode`** : `"focus_ltf"` ou `"focus_htf"` (choix utilisateur).
+- **`ltf_array`** : listes des TF « basses », **modifiable par l’utilisateur**. Valeurs par défaut : `[1, 5, 15, 60]` (1m, 5m, 15m, 1h) — indices 0 à 3. **Contrainte :** la liste doit être **strictement croissante** (de la TF la plus petite à la plus grande ; ex. valide : 1, 5, 15, 60 ; invalide : 1, 15, 60, 5). Le code doit vérifier cette contrainte.
+- **`htf_array`** : listes des TF « hautes », **modifiable par l’utilisateur**. Valeurs par défaut : `[15, 60, 240, D]` (15m, 1h, 4h, 1d) — indices 0 à 3. **Contrainte :** même règle d’ordre croissant (ex. valide : 15, 60, 240, D ; invalide : 60, 15, 240, D).
+- **`trading_mode`** : paramètre modifiable par l’utilisateur qui **indique si l’utilisateur trade sur des LTF ou sur des HTF**. Deux valeurs : **`ltf_trading`** (scalping ou day trading) ou **`htf_trading`** (swing, trading sur les hautes timeframes).
 - **`tf_graph`** : la timeframe du graphique (ou TF principale en input).
 
 ### Principe : un indice x, une paire (ou triplet) de TF
@@ -117,14 +117,14 @@ Cette logique détermine **quelles TF sont étudiées** et **quel type d’infor
 
 1. **`tf_graph` uniquement dans `ltf_array`** (ex. 1m, 5m) → graphique LTF. **x** = index de `tf_graph` dans `ltf_array`. **ltf** = `tf_graph`, **htf** = `htf_array[x]`.
 2. **`tf_graph` uniquement dans `htf_array`** (ex. 4h, 1d) → graphique HTF. **x** = index dans `htf_array`. **htf** = `tf_graph`. Pas de LTF d’étude.
-3. **`tf_graph` dans les deux** (15m ou 1h) → **`tf_mode`** décide : **focus_ltf** → on traite comme LTF (ltf, htf selon x dans htf_array) ; **focus_htf** → on traite comme HTF (htf = tf_graph, pas de LTF).
+3. **`tf_graph` dans les deux** (15m ou 1h) → **`trading_mode`** décide : **ltf_trading** → on traite comme LTF (ltf, htf selon x dans htf_array) ; **htf_trading** → on traite comme HTF (htf = tf_graph, pas de LTF).
 
 ### Mode d’affichage et sorties exposées
 
 - **Vue HTF seule** (`is_htf_only` = true) : contexte HTF uniquement (Modules 1 + 2). Pas de sweep, retest, proposition d’entrée.
 - **Vue LTF + HTF** (`is_htf_only` = false) : contexte HTF + confirmations LTF + proposition d’entrée (Modules 1 + 2 + 3 + 4).
 
-**Variables pour le code** : `tf_graph`, `is_htf_only`, `tf_ltf`, `tf_htf` (plus tard `tf_htf2`).
+**Variables pour le code** : `trading_mode` (input utilisateur), `tf_graph`, `is_htf_only`, `tf_ltf`, `tf_htf` (plus tard `tf_htf2`).
 
 ---
 
@@ -132,7 +132,7 @@ Cette logique détermine **quelles TF sont étudiées** et **quel type d’infor
 
 ### Vue HTF seule (`is_htf_only` = true)
 
-**Quand** : graphique considéré comme HTF (ex. 4h, 1d ; ou 15m/1h en mode focus_htf). **TF** : `tf_htf` = TF du graphique ; pas de `tf_ltf`.
+**Quand** : graphique considéré comme HTF (ex. 4h, 1d ; ou 15m/1h en mode htf_trading). **TF** : `tf_htf` = TF du graphique ; pas de `tf_ltf`.
 
 **Attendu** :
 - **Contexte HTF** : tendance (HH/HL ou LH/LL), biais, BOS/CHoCH sur la HTF, zones de liquidité (Equal High/Low, anciens High/Low). Données via `request.security` avec `tf_htf`.
@@ -143,7 +143,7 @@ Cette logique détermine **quelles TF sont étudiées** et **quel type d’infor
 
 ### Vue LTF + HTF (`is_htf_only` = false)
 
-**Quand** : graphique considéré comme LTF (ex. 5m, 15m ; ou 15m/1h en mode focus_ltf). **TF** : `tf_htf` pour contexte/zones ; `tf_ltf` = TF du graphique pour confirmations et setup.
+**Quand** : graphique considéré comme LTF (ex. 5m, 15m ; ou 15m/1h en mode ltf_trading). **TF** : `tf_htf` pour contexte/zones ; `tf_ltf` = TF du graphique pour confirmations et setup.
 
 **Attendu** :
 - **Contexte HTF** et **Zones clés HTF** : identiques à la vue HTF, affichés sur le graphique LTF.

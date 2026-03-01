@@ -6,7 +6,7 @@ Indicateur **multi-timeframe (MTF)** pour TradingView : analyse visuelle et aide
 
 ## Description
 
-L’indicateur prépare une **analyse technique en temps réel** sur le graphique affiché. Selon la timeframe et le mode (scalp/day ou swing), il affiche :
+L’indicateur prépare une **analyse technique en temps réel** sur le graphique affiché. Un paramètre **trading_mode** permet à l’utilisateur d’indiquer s’il trade sur des LTF (ltf_trading : scalping/day) ou des HTF (htf_trading : swing). Selon la timeframe et ce réglage, l’indicateur affiche :
 
 - **Contexte HTF** : tendance, structure (HH/HL, LH/LL), BOS/CHoCH, zones de liquidité  
 - **Zones clés HTF** : Order Blocks, FVG, Discount/Premium  
@@ -20,7 +20,7 @@ Toutes les infos détectées restent affichées même sans signal final, pour un
 ## Stack
 
 - **Pine Script v6** (TradingView)  
-- **MTF** : `request.security()` avec logique de sélection des timeframes (focus LTF / focus HTF)  
+- **MTF** : `request.security()` avec logique de sélection des timeframes (trading_mode : ltf_trading / htf_trading)  
 - **Un seul script** : `indicateur_mtf.pine` (overlay sur le graphique)
 
 ---
@@ -39,7 +39,7 @@ Toutes les infos détectées restent affichées même sans signal final, pour un
 
 1. Ouvrir le script **`indicateur_mtf.pine`** dans l’éditeur Pine de TradingView (ou copier-coller son contenu).  
 2. Cliquer sur **« Ajouter au graphique »**.  
-3. L’indicateur s’exécute sur le **symbole** et la **timeframe** du graphique. Ajuster le mode (focus LTF / focus HTF) via les paramètres d’entrée si besoin.  
+3. L’indicateur s’exécute sur le **symbole** et la **timeframe** du graphique. Dans les paramètres (engrenage), choisir **trading_mode** selon que vous tradez sur des LTF (ltf_trading) ou des HTF (htf_trading).  
 
 *Il n’y a pas d’import de fichier .pine dans TradingView : le workflow est édition locale (IDE/Git) puis copier-coller dans l’éditeur pour tester.*
 

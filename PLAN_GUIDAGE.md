@@ -113,9 +113,9 @@ Ce plan est voué à **évoluer** : sous-étapes et méthodes pourront être dé
 
 **Référence détaillée :** PROJECT_GUIDE.md → section « Sélection des timeframes (logique centrale du projet) ».
 
-- [ ] Ajouter l’input `tf_mode` (options : focus_ltf / focus_htf)
-- [ ] Définir les tableaux `ltf_array` = [1, 5, 15, 60] et `htf_array` = [15, 60, 240, D]
-- [ ] Implémenter la logique d’indice **x** : selon que `tf_graph` est seulement dans LTF, seulement dans HTF, ou dans les deux (alors `tf_mode` décide) → calcul de **x**, puis **ltf** = ltf_array[x], **htf** = htf_array[x]
+- [ ] Ajouter l’input **`trading_mode`** : paramètre visuel permettant à l’utilisateur d’indiquer s’il trade sur des LTF ou des HTF. Options : **ltf_trading** (scalping ou day trading), **htf_trading** (swing, hautes TF). Descriptions explicites dans le script.
+- [ ] Exposer **ltf_array** et **htf_array** en paramètres modifiables par l’utilisateur (valeurs par défaut : [1, 5, 15, 60] et [15, 60, 240, D]). Vérifier que chaque liste est **strictement croissante** (ex. 1, 5, 15, 60 ✓ ; 1, 15, 60, 5 ✗) ; en cas d’invalidité, appliquer une règle définie (défaut, tri ou avertissement).
+- [ ] Implémenter la logique d’indice **x** : selon que `tf_graph` est seulement dans LTF, seulement dans HTF, ou dans les deux (alors `trading_mode` décide) → calcul de **x**, puis **ltf** = ltf_array[x], **htf** = htf_array[x]
 - [ ] Exposer **is_htf_only** (vue HTF seule = contexte uniquement ; vue LTF = contexte HTF + raffinement LTF) et les variables **tf_ltf**, **tf_htf**
 - [ ] (Optionnel) Afficher en label ou en table la TF du graphique, la vue (HTF seul / LTF+HTF), et les TF utilisées (LTF, HTF)
 
@@ -181,7 +181,7 @@ Chaque condition est traitée **indépendamment**, puis agrégée au signal fina
 
 ### Phase 7 – Revue et évolution
 
-- [ ] Tester sur plusieurs instruments et TF (1h/5m en focus_ltf, 4h/1h en focus_htf, etc.)
+- [ ] Tester sur plusieurs instruments et TF (1h/5m en ltf_trading, 4h/1h en htf_trading, etc.)
 - [ ] Ajuster le plan : détailler sous-étapes, ajouter phases de refactor si besoin, documenter les méthodes (PROJECT_GUIDE.md ou fichier dédié)
 
 ---
@@ -199,6 +199,6 @@ Chaque condition est traitée **indépendamment**, puis agrégée au signal fina
 
 **État actuel :** Phase 0 terminée uniquement.
 
-**Prochaine étape :** **Phase 1 – Paramètres globaux et logique TF** (tf_mode, ltf_array/htf_array, indice x, tf_ltf/tf_htf, is_htf_only). Puis Phase 2 – Module 1 (Contexte HTF) : `request.security()` sur `tf_htf`, tendance/structure, BOS/CHoCH, zones de liquidité. Détail des sous-tâches ci-dessus (§ 5, Phase 2).
+**Prochaine étape :** **Phase 1 – Paramètres globaux et logique TF** (trading_mode, ltf_array/htf_array, indice x, tf_ltf/tf_htf, is_htf_only). Puis Phase 2 – Module 1 (Contexte HTF) : `request.security()` sur `tf_htf`, tendance/structure, BOS/CHoCH, zones de liquidité. Détail des sous-tâches ci-dessus (§ 5, Phase 2).
 
 **Référence :** [PROJECT_GUIDE.md](PROJECT_GUIDE.md) (cahier des charges, logique TF, modules).

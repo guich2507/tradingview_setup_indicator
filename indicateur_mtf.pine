@@ -8,10 +8,17 @@
 indicator("Indicateur MTF modulaire", shorttitle="MTF Mod", overlay=true, max_labels_count=500, max_boxes_count=500)
 
 // ———————————————————————————————————————————————————————————
-// PARAMÈTRES ET INPUTS (à compléter en Phase 1 : tf_mode, TF…)
+// PARAMÈTRES ET INPUTS (Phase 1 : trading_mode, TF…)
 // ———————————————————————————————————————————————————————————
 
-// (vide pour l’instant ; Phase 1 ajoutera tf_mode, ltf_array, htf_array, etc.)
+// Indique si vous tradez sur des LTF (scalping, day trading) ou sur des HTF (swing, hautes timeframes).
+trading_mode = input.string(
+     "ltf_trading",
+     title="Mode de trading",
+     options=["ltf_trading", "htf_trading"],
+     tooltip="Choisissez le type de timeframes sur lesquelles vous tradez.\n\n• ltf_trading : vous tradez sur les timeframes basses — scalping ou day trading.\n\n• htf_trading : vous tradez sur les hautes timeframes — swing, etc.",
+     group="Sélection des timeframes"
+     )
 
 // ———————————————————————————————————————————————————————————
 // MODULE 1 – Contexte HTF (Phase 2)
